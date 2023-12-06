@@ -1,8 +1,8 @@
 from flask_restful import Api
-from .hello_world import HelloWorld
 from .login import Login
+from .cookie import Cookie
 
 api = Api()
 
-api.add_resource(HelloWorld, '/helloworld')
 api.add_resource(Login, '/login')
+api.add_resource(Cookie, '/cookie')

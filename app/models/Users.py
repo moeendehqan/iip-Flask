@@ -14,6 +14,9 @@ class Users():
     def get_user(self,username,password):
         return cl.find_one({'username':username,'password':password})
     
+    def check_cookie(self, id):
+        return cl.find_one({'_id':id})
+
     def create_user(self,creator,username,password):
         pass
 
