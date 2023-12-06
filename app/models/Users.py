@@ -1,9 +1,10 @@
 from pymongo import MongoClient
 import datetime
-
+from bson import ObjectId
 client = MongoClient()
 db = client["iip"]
 cl = db['users']
+
 class Users():
     def create_super_user(self):
         if cl.find_one({'username':'admin'}) == None:
@@ -15,7 +16,7 @@ class Users():
         return cl.find_one({'username':username,'password':password})
     
     def check_cookie(self, id):
-        return cl.find_one({'_id':id})
+        return cl.find_one({'_id':ObjectId(id)})
 
     def create_user(self,creator,username,password):
         pass
