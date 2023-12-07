@@ -22,4 +22,8 @@ class Connection():
     
     def get_all_connection(self):
         return cl.find()
+    
+    def del_connectionn_by_id(self,id):
+        cl.delete_one({'_id':ObjectId(id)})
+        return True
         

@@ -21,6 +21,8 @@ class DelConnection(Resource):
             return {'reply':False,'msg':'خطا ناشناخته لطفا مجدد وارد شوید'}
         if "delconnetion" not in user['access']:
             return {'reply':False,'msg':'اجازه حذف اتصالات را ندارید'}
+        if self.connection_models.get_connection_by_id(args['_id']) == None:
+            return {'reply':False,'msg':'اتصال یافت نشد'}
         print(args)
-        
-        return True
+        self.connection_models.del_connectionn_by_id(args['_id'])
+        return {'reply':True}
