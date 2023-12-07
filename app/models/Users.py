@@ -8,7 +8,7 @@ cl = db['users']
 class Users():
     def create_super_user(self):
         if cl.find_one({'username':'admin'}) == None:
-            dic = {'username':'admin','password':'admin','creator':'system','date':datetime.datetime.now(),'access':[]}
+            dic = {'username':'admin','password':'admin','creator':'system','date':datetime.datetime.now(),'access':['addconnetion','getconnetion','delconnetion']}
             cl.insert_one(dic)
         return True
     

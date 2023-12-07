@@ -17,7 +17,7 @@ class Connection():
         return cl.find_one({'_id':ObjectId(id)})
     
     def create_connection(self, name, ip, port, username, password, creator):
-        cl.insert_one({'name':name, ip:ip, 'port':port, 'username':username, "password":password, 'creator':creator, 'datetime':datetime.datetime.now()})
+        cl.insert_one({'name':name, 'ip':ip, 'port':port, 'username':username, "password":password, 'creator':creator, 'datetime':datetime.datetime.now()})
         return True
     
     def get_all_connection(self):

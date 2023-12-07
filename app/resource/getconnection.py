@@ -25,6 +25,8 @@ class GetConnetion(Resource):
         if "getconnetion" not in user['access']:
             return {'reply':False,'msg':'اجازه دریافت لیست اتصالات را ندارید'}
         df = pd.DataFrame(self.connection_models.get_all_connection())
+        if len(df) == 0:
+            return {'reply':True,'df':[]}
         df['_id'] = df['_id'].apply(str)
         df['datetime'] = [self.date_models.datetime_to_jalali_str(x) for x in df['datetime']]
         df = df.to_dict('records')

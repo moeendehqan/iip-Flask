@@ -14,4 +14,13 @@ class DelConnection(Resource):
         self.user_models = Users()
         self.connection_models = Connection()
     
-    def post()
+    def post(self):
+        args = parser.parse_args()
+        user = self.user_models.check_cookie(args['id'])
+        if user == None:
+            return {'reply':False,'msg':'خطا ناشناخته لطفا مجدد وارد شوید'}
+        if "delconnetion" not in user['access']:
+            return {'reply':False,'msg':'اجازه حذف اتصالات را ندارید'}
+        print(args)
+        
+        return True
