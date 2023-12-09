@@ -26,4 +26,9 @@ class Connection():
     def del_connectionn_by_id(self,id):
         cl.delete_one({'_id':ObjectId(id)})
         return True
+    
+    def get_all_id_connection(self):
+        list_connect = cl.distinct('_id')
+        list_connect = [str(x) for x in list_connect]
+        return list_connect
         
