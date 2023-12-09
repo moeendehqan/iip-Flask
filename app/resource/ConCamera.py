@@ -2,8 +2,7 @@ from flask_restful import Resource, reqparse
 from app.models.Users import Users
 from app.models.Connection import Connection
 import cv2
-import numpy as np
-from flask import Flask, Response, jsonify
+import time
 import base64
 parser = reqparse.RequestParser()
 parser.add_argument('id', type=str, help='نام id را وارد کنید',required=True)
@@ -47,20 +46,20 @@ class ConCamera(Resource):
         if "addconnetion" not in user['access']:
             return {'reply':False,'msg':'اجازه افزودن اتصال را ندارید '}
         connection = self.connection_models.get_connection_by_id(args['_id'])
-        username = connection['username']
-        password = connection['password']
-        ip = connection['ip']
-        port = connection['port']
-        rtsp_url = f"rtsp://{username}:{password}@{ip}:{port}/cam/realmonitor?channel=1&subtype=1"
+        if connection['type'] == 'ip':
+            username = connection['username']
+            password = connection['password']
+            ip = connection['ip']
+            port = connection['port']
+            rtsp_url = f"rtsp://{username}:{password}@{ip}:{port}/cam/realmonitor?channel=1&subtype=1"
+            cap = cv2.VideoCapture(rtsp_url)
+        else:
+            cap = cv2.VideoCapture(0)
 
-        cap = cv2.VideoCapture(rtsp_url)
         if not cap.isOpened():
             return {'replay':False,'msg':'اتصال برقرار نشد'}
         ret, frame = cap.read() 
-        original_height, original_width, _ = frame.shape
-        height = int(original_height *0.5)
-        width = int(original_width *0.5)
-        frame = cv2.resize(frame, (height, width))
+        frame = cv2.resize(frame, (480, 640))
         _, buffer = cv2.imencode('.jpg', frame)
         frame_bytes = buffer.tobytes()
         frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
