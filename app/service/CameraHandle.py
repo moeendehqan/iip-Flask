@@ -34,24 +34,28 @@ class CameraHandle():
             cap = cv2.VideoCapture(0)
 
         if not cap.isOpened():
-            self.record_model.set_record(ip, port, connection['type'], False, 'اتصال بر قرار نیست', None, [])
+            self.record_model.set_record(_id, ip, port, connection['type'], False, 'اتصال بر قرار نیست', None, [])
         else:
             while True:
                 self.count += 1
                 ret, frame = cap.read()
                 if self.count == 10:
+                    self.count = 0
+
                     results = self.model(frame, augment=True)
                     predictions = results.pred[0]
-                    boxes = []
+                    plates = []
                     if len(predictions) > 0:
 
                         boxes = predictions[:, :4]
                         scores = predictions[:, 4]
                         categories = predictions[:, 5]
+
                         for i in range(len(boxes)):
                             x1, y1, x2, y2 = boxes[i]
                             x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
                             score = scores[i]
+                            plates.append({'score':float(score),'box':[x1, y1, x2, y2]})
                             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                             cv2.putText(frame, f"Score: {score:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
 
@@ -59,6 +63,5 @@ class CameraHandle():
                     _, buffer = cv2.imencode('.jpg', frame)
                     frame_bytes = buffer.tobytes()
                     frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
-                    print(1)
-                    self.record_model.set_record(ip, port, connection['type'], True, None, frame_bytes, boxes)
+                    self.record_model.set_record(_id, ip, port, connection['type'], True, None, frame_bytes, plates)
 
