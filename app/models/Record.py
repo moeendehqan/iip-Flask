@@ -15,5 +15,5 @@ class Record():
         cl.delete_many({'id_comera':id_camera, 'datetime': {'$lt': one_minute_ago}})
         return cl.insert_one(dic)
     def get_last_frame_record(self,id_camera):
-        return cl.find_one({'id_comera':id_camera},sort=[('timestamp', -1)])
+        return cl.find_one({'id_comera':id_camera},sort=[('datetime', -1)])
 

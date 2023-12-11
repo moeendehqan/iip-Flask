@@ -16,7 +16,6 @@ class Users():
         return cl.find_one({'username':username,'password':password})
     
     def check_cookie(self, id):
-        print(id)
         return cl.find_one({'_id':ObjectId(id)})
 
     def create_user(self,creator,username,password):

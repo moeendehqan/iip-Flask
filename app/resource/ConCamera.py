@@ -2,6 +2,7 @@ from flask_restful import Resource, reqparse
 from app.models.Users import Users
 from app.models.Connection import Connection
 from app.models.Record import Record
+import datetime
 import cv2
 import time
 import base64
@@ -25,10 +26,10 @@ class ConCamera(Resource):
         if "concamera" not in user['access']:
             return {'reply':False,'msg':'اجازه اتصال را ندارید '}
         frame = self.record_models.get_last_frame_record(args['_id'])
-        frame['datetime'] = str(frame['datetime'])
-        frame['_id'] = str(frame['_id'])
-        print('1'*23)
-        print(frame)
+        frame['date'] = str(frame['datetime'].date())
+        frame['time'] = str(frame['datetime'].time().strftime('%H:%M:%S'))
+        del frame['datetime']
+        del frame['_id']
 
         return {'reply': True, 'frame': frame}
 
