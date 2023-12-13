@@ -23,7 +23,7 @@ class CameraHandle():
         self.model.max_det = 1000  # maximum number of detections per image
         self.count = 0
         self.model_Ocr = Model.load(
-            hub_or_local_path=r"D:\NewProject\iip-Flask\app\service\ml\crnn-fa-64x256-license-plate-recognition",
+            hub_or_local_path=r"D:\projects\vp\iip Flask\app\service\ml\crnn-fa-64x256-license-plate-recognition",
             load_locally=True,
             load_preprocessor=True,
             model_filename='model.pt',
@@ -31,34 +31,48 @@ class CameraHandle():
         )
     
     def prossece_plate(self, frame,_id, ip, port, type):
-        results = self.model(frame, augment=True)
-        predictions = results.pred[0]
-        plates = []
-        if len(predictions) > 0:
-            boxes = predictions[:, :4]
-            scores = predictions[:, 4]
-            categories = predictions[:, 5]
-            for i in range(len(boxes)):
-                x1, y1, x2, y2 = boxes[i]
-                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                score = scores[i]
-                if float(score)>0.40:
+        try:
+            results = self.model(frame, augment=True)
+            predictions = results.pred[0]
+            plates = []
+            if len(predictions) > 0:
+                boxes = predictions[:, :4]
+                scores = predictions[:, 4]
+                categories = predictions[:, 5]
+                for i in range(len(boxes)):
+                    x1, y1, x2, y2 = boxes[i]
+                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                    score = scores[i]
+                    if float(score)>0.40:
 
-                    cropped_image = frame[y1:y2, x1:x2]
-                    cv2.imwrite(r'app\service\temp\a'+_id+'.jpg', cropped_image)
-                    number = self.model_Ocr.predict(r'app\service\temp\a'+_id+'.jpg')
-                    if 'text' in number[0].keys():
-                        number = number[0]['text']
-                        if len(number) == 8:
-                            print(number)
-                            plates.append({'score':float(score), 'box':[x1, y1, x2, y2], 'number':number})
-                            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                            cv2.putText(frame, f"Score: {score:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
-        _, buffer = cv2.imencode('.jpg', frame)
-        frame_bytes = buffer.tobytes()
-        frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
-        self.record_model.set_record(_id, ip, port, type, True, None, frame_bytes, plates)
+                        cropped_image = frame[y1:y2, x1:x2]
+                        # تبدیل تصویر به مقیاس خاکستری
+                        cropped_image = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2GRAY)
+                        # افزایش کنتراست با اعمال CLAHE
+                        clahe = cv2.createCLAHE(clipLimit=6.0, tileGridSize=(1, 1))
+                        cropped_image = clahe.apply(cropped_image)
+                        cv2.imwrite(r'app\service\temp\a'+_id+'.jpg', cropped_image)
+                        plateNumber = self.model_Ocr.predict(r'app\service\temp\a'+_id+'.jpg')
+                        if 'text' in plateNumber[0].keys():
+                            plateNumber = plateNumber[0]['text']
+                            if len(plateNumber) == 8:
+                                try:
+                                    idplate = int(plateNumber[:2])
+                                    alpha = plateNumber[2:3]
+                                    serial =int(plateNumber[3:6])
+                                    city = int(plateNumber[6:])
+                                    plates.append({'score':float(score), 'box':[x1, y1, x2, y2], 'number':{'idplate':idplate,'alpha':alpha,'serial':serial,'city':city}})
+                                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                                    cv2.putText(frame, f"Score: {score:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
+                                except:
+                                    pass
 
+            _, buffer = cv2.imencode('.jpg', frame)
+            frame_bytes = buffer.tobytes()
+            frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
+            self.record_model.set_record(_id, ip, port, type, True, None, frame_bytes, plates)
+        except:
+            pass
 
 
     def record(self,_id):
@@ -80,6 +94,7 @@ class CameraHandle():
                 self.count += 1
                 ret, frame = cap.read()
                 if self.count == 10 and connection['type'] == 'ip':
+                    self.prossece_plate(frame, _id, ip, port, connection['type'])
                     self.count = 0
                 elif connection['type'] != 'ip':
                     time.sleep(0.1)
