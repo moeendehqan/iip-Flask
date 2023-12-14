@@ -23,7 +23,7 @@ class CameraHandle():
         self.model.max_det = 1000  # maximum number of detections per image
         self.count = 0
         self.model_Ocr = Model.load(
-            hub_or_local_path=r"D:\projects\vp\iip Flask\app\service\ml\crnn-fa-64x256-license-plate-recognition",
+            hub_or_local_path=r"D:\NewProject\iip-Flask\app\service\ml\crnn-fa-64x256-license-plate-recognition",
             load_locally=True,
             load_preprocessor=True,
             model_filename='model.pt',

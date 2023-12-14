@@ -5,6 +5,8 @@ from .addconnection import AddConnetion
 from .getconnection import GetConnetion
 from .delconnection import DelConnection
 from .ConCamera import ConCamera
+from .SetRules import SetRules
+from .get
 
 api = Api()
 
@@ -14,3 +16,4 @@ api.add_resource(AddConnetion, '/addconnetion')
 api.add_resource(GetConnetion, '/getconnetion')
 api.add_resource(DelConnection, '/delconnection')
 api.add_resource(ConCamera, '/concamera')
+api.add_resource(SetRules, '/setrules')
