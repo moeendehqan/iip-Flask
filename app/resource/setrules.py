@@ -26,10 +26,14 @@ class SetRules(Resource):
             return {'reply':False,'msg':'خطا ناشناخته لطفا مجدد وارد شوید'}
         if "setrules" not in user['access']:
             return {'reply':False,'msg':'اجازه افزودن قانون را ندارید '}
-        if len(args['idplate']) != 2 or len(args['alpha']) != 1 or len(args['serial']) != 3 or len(args['city']) != 2:
+        if len(args['idplate']) != 2 or (len(args['alpha']) != 1 and args['alpha']!='الف') or len(args['serial']) != 3 or len(args['city']) != 2:
             return {'reply':False,'msg':'شماره پلاک صحیح نیست '}
         res = self.rules_models.set_rules(args['id'], args['idplate'], args['alpha'], args['serial'], args['city'], args['status'])
-        return {'reply':True}
+
+        if res:
+            return {'reply':True}
+        else:
+            return {'reply':True, 'msg':'خطا در ثبت'}
         
         
         
