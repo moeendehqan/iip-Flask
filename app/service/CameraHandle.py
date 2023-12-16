@@ -1,13 +1,15 @@
 from app.models.Record import Record
 from app.models.Connection import Connection
 from hezar.models import Model
-
+from app.service.RulesHandle import RulesHandle
+from app.models.Rules import Rulse
 import cv2
 import yolov5
 import time
 import base64
 import torch
-
+import os
+import sys
 class CameraHandle():
     def __init__(self):
         self.record_model = Record()
@@ -22,13 +24,18 @@ class CameraHandle():
         self.model.multi_label = False  # NMS multiple labels per box
         self.model.max_det = 1000  # maximum number of detections per image
         self.count = 0
+        self.pwd = os.path.join(os.getcwd(),'app\service\ml\crnn-fa-64x256-license-plate-recognition')
         self.model_Ocr = Model.load(
-            hub_or_local_path=r"D:\NewProject\iip-Flask\app\service\ml\crnn-fa-64x256-license-plate-recognition",
+            hub_or_local_path=self.pwd,
             load_locally=True,
             load_preprocessor=True,
             model_filename='model.pt',
             config_filename='model_config.yaml'
         )
+
+        self.rule_handle_model = RulesHandle()
+        self.rule_model = Rulse()
+
     
     def prossece_plate(self, frame,_id, ip, port, type):
         try:
@@ -61,7 +68,9 @@ class CameraHandle():
                                     alpha = plateNumber[2:3]
                                     serial =int(plateNumber[3:6])
                                     city = int(plateNumber[6:])
-                                    plates.append({'score':float(score), 'box':[x1, y1, x2, y2], 'number':{'idplate':idplate,'alpha':alpha,'serial':serial,'city':city}})
+                                    status = self.rule_model.get_statuse_by_plate(idplate, alpha, serial, city)
+                                    self.rule_handle_model.CheckAllow(status)
+                                    plates.append({'score':float(score), 'box':[x1, y1, x2, y2], 'number':{'idplate':idplate,'alpha':alpha,'serial':serial,'city':city}, 'status':status})
                                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                                     cv2.putText(frame, f"Score: {score:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
                                 except:

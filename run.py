@@ -1,7 +1,7 @@
 
 from app import create_app
 import asyncio
-import time
+from app.service.add_host import add_entry_to_hosts_file
 import socket
 
 import threading
@@ -16,9 +16,9 @@ amerahandle_models = CameraHandle()
 
 
 if __name__ == "__main__":
-    local_ip = socket.gethostbyname('vcs_sserver')
+    add_entry_to_hosts_file('vsc.server','127.0.0.2')
 
-
+    local_ip = socket.gethostbyname('vsc.server')
     # ایجاد تعدادی ترد جداگانه برای اجرای توابع تکراری
     threads = []
     for i in connection_list:
