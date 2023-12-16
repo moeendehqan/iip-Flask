@@ -16,8 +16,21 @@ class RulseHandle():
             return 1
     def gate(self,status):
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(status+1, GPIO.OUT)
-        GPIO.output(status+1, GPIO.HIGH)
+        GPIO.setup(1, GPIO.OUT)
+        GPIO.setup(2, GPIO.OUT)
+        GPIO.setup(3, GPIO.OUT)
+        if status == 0:
+            GPIO.output(1, GPIO.HIGH)
+            GPIO.output(2, GPIO.LOW)
+            GPIO.output(3, GPIO.LOW)
+        if status == 1:
+            GPIO.output(1, GPIO.LOW)
+            GPIO.output(2, GPIO.HIGH)
+            GPIO.output(3, GPIO.LOW)
+        if status == 3:
+            GPIO.output(1, GPIO.LOW)
+            GPIO.output(2, GPIO.LOW)
+            GPIO.output(3, GPIO.HIGH)
 
         
 
