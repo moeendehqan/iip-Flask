@@ -5,5 +5,4 @@ app/resource/__pycache__
 app/service/__pycache__
 app/__pycache__
 cudnn-local-repo-debian11-8.9.6.50_1.0-1_amd64.deb
-app/service/ml/crnn-fa-64x256-license-plate-recognition
-app/service/ml
+
