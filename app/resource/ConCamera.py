@@ -2,10 +2,7 @@ from flask_restful import Resource, reqparse
 from app.models.Users import Users
 from app.models.Connection import Connection
 from app.models.Record import Record
-import datetime
-import cv2
-import time
-import base64
+
 parser = reqparse.RequestParser()
 parser.add_argument('id', type=str, help='نام id را وارد کنید',required=True)
 parser.add_argument('_id', type=str, help='شناسه یافت نشد',required=True)

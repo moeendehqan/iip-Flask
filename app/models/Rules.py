@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 import datetime
 from bson import ObjectId
-import time
 
 client = MongoClient()
 db = client["iip"]
