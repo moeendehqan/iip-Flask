@@ -24,7 +24,7 @@ class CameraHandle():
         self.model.multi_label = False  # NMS multiple labels per box
         self.model.max_det = 1000  # maximum number of detections per image
         self.count = 0
-        model_path = os.path.join(os.getcwd(), 'app', 'service', 'ml', 'crnn-fa-64x256-license-plate-recognition')
+        model_path = os.path.join(os.getcwd(), 'app', 'service', 'ml', 'crnn')
         self.model_Ocr = Model.load(
             hub_or_local_path=model_path,
             load_locally=True,
