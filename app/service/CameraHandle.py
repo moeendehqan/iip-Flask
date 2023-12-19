@@ -89,7 +89,7 @@ class CameraHandle():
             frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
             self.record_model.set_record(_id, ip, port, type, True, None, frame_bytes, plates, status)
         except:
-            self.record_model.set_record(_id, ip, port, type, False, None, None, None, None)
+            self.record_model.set_record(_id, ip, port, type, False, None, None, [], None)
             pass
 
 
