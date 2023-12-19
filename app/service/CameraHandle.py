@@ -1,8 +1,7 @@
 from app.models.Record import Record
 from app.models.Connection import Connection
 from hezar.models import Model
-from app.service.RulesHandle import RulesHandle
-from app.models.Rules import Rulse
+
 import cv2
 import yolov5
 import time
@@ -32,13 +31,6 @@ class CameraHandle():
             model_filename='model.pt',
             config_filename='model_config.yaml'
         )
-        try:
-            self.rule_handle_model = RulesHandle()
-        except:
-            pass
-    
-        self.rule_model = Rulse()
-
     
     def prossece_plate(self, frame,_id, ip, port, type):
         try:
@@ -73,12 +65,7 @@ class CameraHandle():
                                     alpha = plateNumber[2:3]
                                     serial =int(plateNumber[3:6])
                                     city = int(plateNumber[6:])
-                                    status = self.rule_model.get_statuse_by_plate(idplate, alpha, serial, city)
-                                    try:
-                                        self.rule_handle_model.CheckAllow(status)
-                                    except:
-                                        pass
-                                    plates.append({'score':float(score), 'box':[x1, y1, x2, y2], 'number':{'idplate':idplate,'alpha':alpha,'serial':serial,'city':city}, 'status':status})
+                                    plates.append({'score':float(score), 'box':[x1, y1, x2, y2], 'number':{'idplate':idplate,'alpha':alpha,'serial':serial,'city':city}})
                                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                                     cv2.putText(frame, f"Score: {score:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
                                 except:

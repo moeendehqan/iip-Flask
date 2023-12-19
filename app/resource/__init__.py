@@ -6,8 +6,7 @@ from .getconnection import GetConnetion
 from .delconnection import DelConnection
 from .ConCamera import ConCamera
 from .SetRules import SetRules
-from .GetRules import GetRules
-from .DelRules import DelRules
+from .get
 
 api = Api()
 
