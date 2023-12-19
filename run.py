@@ -1,7 +1,5 @@
 
 from app import create_app
-import asyncio
-import time
 
 import threading
 from app.service.CameraHandle import CameraHandle
@@ -15,8 +13,6 @@ amerahandle_models = CameraHandle()
 
 
 if __name__ == "__main__":
-
-
     # ایجاد تعدادی ترد جداگانه برای اجرای توابع تکراری
     #threads = []
     #for i in connection_list:

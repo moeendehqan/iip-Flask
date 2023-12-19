@@ -1,0 +1,11 @@
+opencv-python
+pymongo
+Flask-RESTful
+ipaddress
+pandas
+hezar
+yolov5
+torch
+persiantools
+gpiozero
+Flask-Cors

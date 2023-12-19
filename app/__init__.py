@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_cors import CORS
-from mongoengine import connect
 from app.resource import api
 from app.models.Users import Users
 def create_app():
