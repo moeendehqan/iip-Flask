@@ -54,9 +54,9 @@ class CameraHandle():
                         # افزایش کنتراست با اعمال CLAHE
                         clahe = cv2.createCLAHE(clipLimit=6.0, tileGridSize=(1, 1))
                         cropped_image = clahe.apply(cropped_image)
-                        patch = os.path.join(os.getcwd(), 'app', 'service', 'ml', 'a_id'+_id)
-                        cv2.imwrite(patch, cropped_image)
-                        plateNumber = self.model_Ocr.predict(patch)
+                        path = os.path.join(os.getcwd(), 'app', 'service','temp', f'a_{_id}.jpg')
+                        cv2.imwrite(path, cropped_image)
+                        plateNumber = self.model_Ocr.predict(path)
                         if 'text' in plateNumber[0].keys():
                             plateNumber = plateNumber[0]['text']
                             if len(plateNumber) == 8:
@@ -76,7 +76,10 @@ class CameraHandle():
             frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
             self.record_model.set_record(_id, ip, port, type, True, None, frame_bytes, plates, status)
         except:
-            self.record_model.set_record(_id, ip, port, type, False, None, None, [], None)
+            _, buffer = cv2.imencode('.jpg', frame)
+            frame_bytes = buffer.tobytes()
+            frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
+            self.record_model.set_record(_id, ip, port, type, False, None, frame_bytes, [], None)
             pass
 
 
