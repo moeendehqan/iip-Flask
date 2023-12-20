@@ -13,10 +13,14 @@ class CameraHandle():
         self.record_model = Record()
         self.connection_models = Connection()
         self.cap = None
-        self.device = "cpu"
         model_path = os.path.join(os.getcwd(), 'app', 'service', 'ml', 'yolov5n-license-plate', 'best.pt')
         self.model = yolov5.load(model_path)
-        self.model = self.model.to(self.device)
+        try:
+            self.device = "cuda"
+            self.model = self.model.to(self.device)
+        except:
+            self.device = "cpu"
+            self.model = self.model.to(self.device)
         self.model.conf = 0.25  # NMS confidence threshold
         self.model.iou = 0.45  # NMS IoU threshold
         self.model.agnostic = False  # NMS class-agnostic
