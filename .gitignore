@@ -5,4 +5,3 @@ app/resource/__pycache__
 app/service/__pycache__
 app/__pycache__
 rpi/__pycache__/__init__.cpython-311.pyc
-app/service/ml
