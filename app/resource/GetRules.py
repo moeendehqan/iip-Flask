@@ -2,7 +2,8 @@
 from flask_restful import Resource, reqparse
 from app.models.Users import Users
 from app.models.Rules import Rulse
-
+import pandas as pd
+from app.service.date import dateProject
 
 parser = reqparse.RequestParser()
 
@@ -13,7 +14,7 @@ class GetRules(Resource):
     def __init__(self):
         self.user_models = Users()
         self.rules_models = Rulse()
-        self.dateProject_models = dateProject()
+        self.date_models = dateProject()
 
 
     def post(self):
@@ -24,4 +25,12 @@ class GetRules(Resource):
         if "getrules" not in user['access']:
             return {'reply':False,'msg':'اجازه مشاهده قانون را ندارید '}
         df = self.rules_models.get_all_rules()
+        df = pd.DataFrame(df)
+        if len(df)==0:
+            return {'reply':False}
+        df['_id'] = df['_id'].apply(str)
+        df['datetime'] = df['datetime'].apply(self.date_models.datetime_to_jalali_str)
+        df = df.to_dict('records')
+        
+
         return {'reply':True, 'df':df}

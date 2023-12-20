@@ -1,6 +1,7 @@
 from app.models.Record import Record
 from app.models.Connection import Connection
 from hezar.models import Model
+from app.models.Rules import Rulse
 
 import cv2
 import yolov5
@@ -8,6 +9,8 @@ import time
 import base64
 import torch
 import os
+from transformers import YolosImageProcessor, YolosForObjectDetection
+
 class CameraHandle():
     def __init__(self):
         self.record_model = Record()
@@ -35,6 +38,11 @@ class CameraHandle():
             model_filename='model.pt',
             config_filename='model_config.yaml'
         )
+        self.rules_model = Rulse()
+        self.Camera_Object = self.rules_model.get_id_camera_object()
+        model_path = os.path.join(os.getcwd(), 'app', 'service', 'ml', 'yolos-tiny')
+        self.model_Object = YolosForObjectDetection.from_pretrained(model_path)
+        self.image_processor = YolosImageProcessor.from_pretrained(model_path)
     
     def prossece_plate(self, frame,_id, ip, port, type):
         try:
@@ -78,13 +86,48 @@ class CameraHandle():
             _, buffer = cv2.imencode('.jpg', frame)
             frame_bytes = buffer.tobytes()
             frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
-            self.record_model.set_record(_id, ip, port, type, True, None, frame_bytes, plates, status)
+            self.record_model.set_record(_id, ip, port, type, True, None, frame_bytes, plates, status, [])
         except:
-            _, buffer = cv2.imencode('.jpg', frame)
-            frame_bytes = buffer.tobytes()
-            frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
-            self.record_model.set_record(_id, ip, port, type, False, None, frame_bytes, [], None)
+            #_, buffer = cv2.imencode('.jpg', frame)
+            #frame_bytes = buffer.tobytes()
+            #frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
+            #self.record_model.set_record(_id, ip, port, type, False, None, frame_bytes, [], None)
             pass
+    
+    def Detect_Object(self, frame, _id, ip, port):
+        inputs = self.image_processor(images=frame, return_tensors="pt")
+        outputs = self.model_Object(**inputs)
+        logits = outputs.logits
+        bboxes = outputs.pred_boxes
+        target_sizes = torch.tensor([frame.shape[1::-1]])
+        results = self.image_processor.post_process_object_detection(outputs, threshold=0.9, target_sizes=target_sizes)[0]
+        res = []
+        for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
+            box = [round(i, 2) for i in box.tolist()]
+            # Draw bounding box on the image
+            start_point = (int(box[0]), int(box[1]))
+            end_point = (int(box[2]), int(box[3]))
+            color = (0, 255, 0)  # Green color
+            thickness = 2
+            frame = cv2.rectangle(frame, start_point, end_point, color, thickness)
+            lbl = self.model_Object.config.id2label[label.item()]
+            scr = round(score.item(), 3)
+            dic = {'label':lbl,'score':scr}
+            res.append(dic)
+            # Display label and confidence on the image
+            label_text = f"{lbl}: {scr}"
+            org = (int(box[0]), int(box[1]) - 10)  # Above the box
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.5
+            font_color = (100, 255, 255)  # White color
+            line_type = 1
+            frame = cv2.putText(frame, label_text, org, font, font_scale, font_color, line_type)
+        _, buffer = cv2.imencode('.jpg', frame)
+        frame_bytes = buffer.tobytes()
+        frame_bytes = base64.b64encode(frame_bytes).decode('utf-8')
+        self.record_model.set_record(_id, ip, port, type, True, None, frame_bytes, [], 1, res)
+
+        pass
 
 
     def record(self,_id):
@@ -105,9 +148,12 @@ class CameraHandle():
             while True:
                 self.count += 1
                 ret, frame = cap.read()
-                if self.count == 10 and connection['type'] == 'ip':
+                if self.count == 10 and connection['type'] == 'ip' and _id not in self.Camera_Object:
                     self.prossece_plate(frame, _id, ip, port, connection['type'])
                     self.count = 0
-                elif connection['type'] != 'ip':
+                elif connection['type'] != 'ip' and _id not in self.Camera_Object:
                     time.sleep(0.1)
                     self.prossece_plate(frame, _id, None, None, connection['type'])
+                elif self.count == 10 and connection['type'] == 'ip' and _id in self.Camera_Object:
+                    self.Detect_Object()
+
