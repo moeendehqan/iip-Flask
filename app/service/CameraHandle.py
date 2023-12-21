@@ -115,7 +115,6 @@ class CameraHandle():
             scr = round(score.item(), 3)
             dic = {'label':lbl,'score':scr}
             res.append(dic)
-            # Display label and confidence on the image
             label_text = f"{lbl}: {scr}"
             org = (int(box[0]), int(box[1]) - 10)  # Above the box
             font = cv2.FONT_HERSHEY_SIMPLEX
