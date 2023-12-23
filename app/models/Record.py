@@ -8,12 +8,11 @@ cl = db['Record']
 
 
 class Record():
-    def set_record(self, id_camera, ip, port, rule_type, connect, error, image, plate, status, obj):
+    def set_record(self, id_camera, ip, port, connect, error, image, plate, status):
         current_time = datetime.datetime.now()
         one_minute_ago = current_time - datetime.timedelta(seconds=20)
         dic = {'id_camera': id_camera, 'connect': connect, 'error': error, 'timestamp': time.time() * 1000,
-               "datetime": current_time, 'ip': ip, 'port': port, 'typeRule': rule_type, 'image': image, 'plate': plate,
-               'status': status, 'object': obj}
+               "datetime": current_time, 'ip': ip, 'port': port, 'image': image, 'plate': plate, 'status': status,}
         cl.delete_many({'id_camera': id_camera, 'datetime': {'$lt': one_minute_ago}})
 
         return cl.insert_one(dic)

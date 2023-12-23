@@ -24,6 +24,7 @@ class CameraHandle():
         except:
             self.device = "cpu"
             self.model = self.model.to(self.device)
+        print(torch.cuda.is_available())
         self.model.conf = 0.25  # NMS confidence threshold
         self.model.iou = 0.45  # NMS IoU threshold
         self.model.agnostic = False  # NMS class-agnostic
@@ -38,12 +39,6 @@ class CameraHandle():
             model_filename='model.pt',
             config_filename='model_config.yaml'
         )
-        self.rules_model = Rulse()
-        self.Camera_Object = self.rules_model.get_id_camera_object()
-        model_path = os.path.join(os.getcwd(), 'app', 'service', 'ml', 'yolos-tiny')
-        print(model_path)
-        self.model_Object = YolosForObjectDetection.from_pretrained(model_path)
-        self.image_processor = YolosImageProcessor.from_pretrained(model_path)
     
     def prossece_plate(self, frame,_id, ip, port, type):
         try:
@@ -148,14 +143,10 @@ class CameraHandle():
             while True:
                 self.count += 1
                 ret, frame = cap.read()
-                if self.count == 10 and connection['type'] == 'ip' and _id not in self.Camera_Object:
+                if self.count == 10 and connection['type'] == 'ip':
                     self.prossece_plate(frame, _id, ip, port, connection['type'])
                     self.count = 0
-                elif connection['type'] != 'ip' and _id not in self.Camera_Object:
+                elif connection['type'] != 'ip' :
                     time.sleep(0.1)
                     self.prossece_plate(frame, _id, None, None, connection['type'])
-                    self.count = 0
-                elif self.count == 10 and connection['type'] == 'ip' and _id in self.Camera_Object:
-                    self.Detect_Object(frame, _id, ip, port)
-                    self.count = 0
 
